@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: moveit_fanuc_description
+    relative_path: urdf/lrmate200id4s.urdf
+  srdf:
+    relative_path: config/fanuc_lrmate200id4s.srdf
+  package_settings:
+    author_name: Logesh
+    author_email: logeshg248@gmail.com
+    generated_timestamp: 1766601491
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity

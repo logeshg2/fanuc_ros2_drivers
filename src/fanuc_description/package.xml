@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>moveit_fanuc_description</name>
+  <version>2.0.7</version>
+  <description>Fanuc Resources used for MoveIt - Currently using LR Mate 200id 4s</description>
+  <maintainer email="logeshg248@gmail.com">Logesh</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <export>
+      <build_type>ament_cmake</build_type>
+  </export>
+</package>
