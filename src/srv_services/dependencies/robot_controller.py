@@ -35,7 +35,7 @@ class robot:
         self.robot_IP = robotIP
         self.CurJointPosList = FANUCethernetipDriver.returnJointCurrentPosition(self.robot_IP)
         self.CurCartesianPosList = FANUCethernetipDriver.returnCartesianCurrentPostion(self.robot_IP)
-        self.PRNumber = 1 # This is the position register for holding coordinates
+        self.PRNumber = 6 # This is the position register for holding coordinates
         self.start_register = 1
         self.sync_register = 2
         self.sync_value = 1
@@ -250,8 +250,9 @@ class robot:
     def is_moving(self) -> bool:
         """! checks to see if robot is moving based on the value of the sync register 1=moving 0=not moving
         """
-        pose1 = self.read_current_cartesian_pose()
-        pose2 = self.read_current_cartesian_pose()
+        # round to 3 decimal digits
+        pose1 = [round(cur_val, 3) for cur_val in self.read_current_cartesian_pose()]
+        pose2 = [round(cur_val, 3) for cur_val in self.read_current_cartesian_pose()]
         diff = list(map(lambda a, b: a - b, pose1, pose2))
         #print("Difference: ", diff)
 
