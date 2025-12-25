@@ -40,6 +40,7 @@ class robot:
         self.sync_register = 2
         self.sync_value = 1
         self.speed_register = 5
+        self.air_gripper_register = 6
 
         self.DEBUG = DEBUG
         FANUCethernetipDriver.DEBUG = DEBUG
@@ -219,7 +220,23 @@ class robot:
         @return             speed in mm/s
         """
         return FANUCethernetipDriver.readR_Register(self.robot_IP, self.speed_register)
+
+    # Function block to control pneumatic gripper
+    # default state of register is 0 - open | and 1 - close
+    def air_gripper_control(self, cmd: str= 'open'):
+        """
+        Function block to trigger pneumatic grippers (aka - air dcvs).
+        These external components are usually controlled using robot output or RO[] registers
         
+        :param cmd: 'close'/'open' command to open and close pneumatic grippers. Default='open'
+        """
+        
+        # write air_gripper_register based on cmd
+        if (cmd == 'close'):
+            FANUCethernetipDriver.writeR_Register(self.robot_IP,  self.air_gripper_register, 1)
+        else:
+            FANUCethernetipDriver.writeR_Register(self.robot_IP,  self.air_gripper_register, 0)
+
     # Starts robot movement and checks to see when it has completed
     # Default to blocking 
     # Function will block until move action is complete

@@ -23,7 +23,8 @@ setup(
     entry_points={
         'console_scripts': [
             'mount_position = srv_services.mount_position:main',
-            'set_speed = srv_services.set_speed:main'
+            'set_speed = srv_services.set_speed:main',
+            'pneumatic_gripper = srv_services.pneumatic_gripper_control:main',
         ],
     },
 )

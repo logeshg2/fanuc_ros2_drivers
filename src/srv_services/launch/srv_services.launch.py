@@ -39,6 +39,15 @@ def generate_launch_description():
         respawn=True,
         respawn_delay=4,
     )
+    air_gripper_node = Node(
+        package=package_name,
+        executable='pneumatic_gripper',
+        #namespace=robot_name,
+        parameters=[{"robot_ip": robot_ip,
+                     "robot_name": robot_name,},],
+        respawn=True,
+        respawn_delay=4,
+    )
  
 
     return launch.LaunchDescription([
@@ -46,6 +55,7 @@ def generate_launch_description():
        robot_ip_launch_arg,
        mount_node,
        speed_node,
+       air_gripper_node,
        #LogInfo(msg=LaunchConfiguration('robot_ip')),
        #LogInfo(msg=LaunchConfiguration('robot_name')),
     ])
