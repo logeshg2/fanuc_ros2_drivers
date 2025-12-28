@@ -1,80 +1,86 @@
-from launch import LaunchDescription
-from launch.actions import ExecuteProcess
 from launch_ros.actions import Node
-from launch.substitutions import Command
-from ament_index_python.packages import get_package_share_directory
-from launch_ros.parameter_descriptions import ParameterValue
+from launch_ros.substitutions import FindPackageShare
+from launch import LaunchDescription
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import PathJoinSubstitution
 import os
+import xacro
+from ament_index_python.packages import get_package_share_directory
+from launch.actions import ExecuteProcess
+
 
 def generate_launch_description():
+    share_dir = get_package_share_directory('moveit_fanuc_description')
 
-    robot_description = ParameterValue(
-    Command([
-        'xacro ',
-        os.path.join(
-            get_package_share_directory('fanuc_moveit_config'),
-            'config',
-            'fanuc_lrmate200id4s.urdf.xacro'
-        )
-    ]),
-    value_type=str
-)
+    xacro_file = os.path.join(share_dir, 'urdf', 'gz_lrmate.xacro.urdf')
+    robot_description_config = xacro.process_file(xacro_file)
+    robot_urdf = robot_description_config.toxml()
+
+    robot_state_publisher_node = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        parameters=[
+            {'robot_description': robot_urdf}
+        ]
+    )
+
+    joint_state_publisher_node = Node(
+        package='joint_state_publisher',
+        executable='joint_state_publisher',
+        name='joint_state_publisher'
+    )
+
+    gazebo_server = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            PathJoinSubstitution([
+                FindPackageShare('gazebo_ros'),
+                'launch',
+                'gzserver.launch.py'
+            ])
+        ]),
+        launch_arguments={
+            'pause': 'false'
+        }.items()
+    )
+
+    gazebo_client = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            PathJoinSubstitution([
+                FindPackageShare('gazebo_ros'),
+                'launch',
+                'gzclient.launch.py'
+            ])
+        ])
+    )
+
+    urdf_spawn_node = Node(
+        package='gazebo_ros',
+        executable='spawn_entity.py',
+        arguments=[
+            '-entity', 'fanuc_lrmate200id4s',
+            '-topic', 'robot_description'
+        ],
+        output='screen'
+    )
+
+    load_joint_state_broadcaster = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller',
+             '--set-state', 'active', 'joint_state_broadcaster'],
+        output='screen')
+
+    load_joint_trajectory_controller = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state',
+             'active', 'fanuc_arm_controller'],
+        output='screen')
+
     return LaunchDescription([
-
-        # Start Gazebo
-        ExecuteProcess(
-            cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so'],
-            output='screen'
-        ),
-
-        # Robot State Publisher
-        Node(
-            package='robot_state_publisher',
-            executable='robot_state_publisher',
-            parameters=[{'robot_description': robot_description}],
-            output='screen'
-        ),
-
-        # Spawn robot
-        Node(
-            package='gazebo_ros',
-            executable='spawn_entity.py',
-            arguments=[
-                '-topic', 'robot_description',
-                '-entity', 'fanuc'
-            ],
-            output='screen'
-        ),
-
-        # Controller manager
-        Node(
-            package='controller_manager',
-            executable='ros2_control_node',
-            parameters=[
-                {'robot_description': robot_description},
-                os.path.join(
-                    get_package_share_directory('fanuc_moveit_config'),
-                    'config',
-                    'ros2_controllers.yaml'
-                )
-            ],
-            output='screen'
-        ),
-
-        # Spawn controllers
-        ExecuteProcess(
-            cmd=[
-                'ros2', 'run', 'controller_manager',
-                'spawner', 'joint_state_broadcaster'
-            ],
-            output='screen'
-        ),
-
-        ExecuteProcess(
-            cmd=[
-                'ros2', 'run', 'controller_manager',
-                'spawner', 'fanuc_arm_controller'
-            ],
-            output='screen'
-        ),
+        robot_state_publisher_node,
+        joint_state_publisher_node,
+        gazebo_server,
+        gazebo_client,
+        urdf_spawn_node,
+        load_joint_state_broadcaster,
+        load_joint_trajectory_controller,
     ])

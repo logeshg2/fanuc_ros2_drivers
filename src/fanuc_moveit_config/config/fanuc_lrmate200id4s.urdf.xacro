@@ -11,10 +11,4 @@
 
     <xacro:fanuc_lrmate200id4s_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/>
 
-    <gazebo>
-        <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
-            <robot_sim_type>gazebo_ros2_control/GazeboSystem</robot_sim_type>
-        </plugin>
-    </gazebo>
-
 </robot>
