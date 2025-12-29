@@ -3,6 +3,7 @@
   <xacro:include filename="$(find moveit_fanuc_description)/urdf/common_materials.xacro"/>
 
   <xacro:macro name="fanuc_lrmate200id4s" params="prefix">
+    <link name="world"></link>
     <!-- links: main serial chain -->
     <link name="${prefix}base_link">
       <visual>
@@ -111,6 +112,11 @@
     </link>
 
     <!-- joints: main serial chain -->
+    <joint name="joint_base" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="world" />
+      <child link="base_link" />
+    </joint>
     <joint name="${prefix}joint_1" type="revolute">
       <origin xyz="0 0 0.330" rpy="0 0 0" />
       <parent link="${prefix}base_link" />
