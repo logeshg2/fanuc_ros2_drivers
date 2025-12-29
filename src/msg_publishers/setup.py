@@ -28,6 +28,7 @@ setup(
             'move_check = msg_publishers.move_check:main',
             'prox_check = msg_publishers.prox_check:main',
             'speed_check = msg_publishers.speed_check:main',
+            'force_sensor = msg_publishers.force_sensor:main',
         ],
     },
 )

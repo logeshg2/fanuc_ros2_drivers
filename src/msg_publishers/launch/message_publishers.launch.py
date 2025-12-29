@@ -75,6 +75,15 @@ def generate_launch_description():
         respawn=True,
         respawn_delay=4,
     )
+    force_sensor = Node(
+        package=package_name,
+        executable='force_sensor',
+        #namespace=robot_name,
+        parameters=[{"robot_ip": robot_ip,
+                     "robot_name": robot_name,},],
+        respawn=True,
+        respawn_delay=4,
+    )
 
     return launch.LaunchDescription([
        robot_name_launch_arg,
@@ -85,6 +94,7 @@ def generate_launch_description():
        move_node,
        prox_node,
        speed_node,
+       force_sensor,
        #LogInfo(msg=LaunchConfiguration('robot_ip')),
        #LogInfo(msg=LaunchConfiguration('robot_name')),
     ])

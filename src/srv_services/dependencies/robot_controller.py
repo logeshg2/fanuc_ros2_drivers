@@ -67,6 +67,26 @@ class robot:
         #print("list=", PR_1_Value)
         return PR_1_Value
 
+    # read R[7], R[8], and R[9] force sensor values (WIP)
+    def read_force_sensor_values(self) -> list[float]:
+        """
+        Reads Force Sensor values from registers R[7], R[8], and R[9] and returns the list of sensor data.
+        Current using FS-15iAe force sensor - reading values from Fz, Mx, and My. (Mean Force Sensor Value)
+        """
+        fz_reg = 7
+        mx_reg = 8
+        my_reg = 9
+        fz_val = FANUCethernetipDriver.readR_Register(self.robot_IP, fz_reg)
+        mx_val = FANUCethernetipDriver.readR_Register(self.robot_IP, mx_reg)
+        my_val = FANUCethernetipDriver.readR_Register(self.robot_IP, my_reg)
+        # NOTE: stored as: R[x] = FS_val * 1000 (removed for now) - WIP 
+
+        # print(f"Force Sensor: Fz: {fz_val}")
+        # print(f"Force Sensor: Mx: {mx_val}")
+        # print(f"Force Sensor: My: {my_val}")
+
+        return [fz_val, mx_val, my_val]     # [Fz, Mx, My]
+
     # write PR[1] offset
     def write_joint_offset(self, joint:int, value:float, blocking:bool=True):
         """! Offsets current joint position by value given in degrees.
