@@ -9,9 +9,9 @@ import os
 import rclpy
 import numpy as np
 
-import dependencies.FANUCethernetipDriver as FANUCethernetipDriver
+import ComDependencies.FANUCethernetipDriver as FANUCethernetipDriver
 
-from dependencies.robot_controller import robot
+from ComDependencies.robot_controller import robot
 from sensor_msgs.msg import JointState
 from rclpy.node import Node
 

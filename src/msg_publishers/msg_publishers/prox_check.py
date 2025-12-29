@@ -3,9 +3,9 @@ import sys
 import os
 import rclpy
 
-import dependencies.FANUCethernetipDriver as FANUCethernetipDriver
+import ComDependencies.FANUCethernetipDriver as FANUCethernetipDriver
 
-from dependencies.robot_controller import robot
+from ComDependencies.robot_controller import robot
 from fanuc_interfaces.msg import ProxReadings
 from rclpy.node import Node
 

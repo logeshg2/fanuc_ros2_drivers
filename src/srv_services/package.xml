@@ -7,6 +7,9 @@
   <maintainer email="kolds@uidaho.edu">Kris Olds</maintainer>
   <license>Apache-2.0</license>
 
+  <depend>fanuc_com_base</depend>
+  <depend>fanuc_interfaces</depend>
+
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>

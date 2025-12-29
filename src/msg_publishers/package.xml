@@ -10,6 +10,7 @@
   <depend>fanuc_interfaces</depend>
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
+  <depend>fanuc_com_base</depend>
   
   <!-- <exec_depend>python3-pycomm3</exec_depend> -->
 

@@ -2,9 +2,9 @@
 import sys
 import rclpy
 
-import dependencies.FANUCethernetipDriver as FANUCethernetipDriver
+import ComDependencies.FANUCethernetipDriver as FANUCethernetipDriver
 
-from dependencies.robot_controller import robot
+from ComDependencies.robot_controller import robot
 from std_srvs.srv import SetBool
 from rclpy.node import Node
 
