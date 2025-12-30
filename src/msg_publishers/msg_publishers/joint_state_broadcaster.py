@@ -2,6 +2,7 @@
 
 """
 This particular node is used for rviz2 simulation - reads the current joint angle and publishes as joint states for rviz2.
+NOTE: "Joint State Broadcaster" - Reads real robot joint position and publishes '/joint_states' topic
 """
 
 import sys
@@ -20,7 +21,7 @@ FANUCethernetipDriver.DEBUG = False
 sys.path.append('./pycomm3/pycomm3')
 
 
-class current_joint(Node):
+class joint_state_broadcaster(Node):
     def __init__(self):
         super().__init__('curr_joint')
 
@@ -66,7 +67,7 @@ class current_joint(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    publisher = current_joint()
+    publisher = joint_state_broadcaster()
 
     rclpy.spin(publisher)
 

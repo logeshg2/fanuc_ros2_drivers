@@ -29,7 +29,7 @@ setup(
             'prox_check = msg_publishers.prox_check:main',
             'speed_check = msg_publishers.speed_check:main',
             'force_sensor = msg_publishers.force_sensor:main',
-            'joint_state_pub = msg_publishers.joint_state_pub:main',
+            'joint_state_broadcaster = msg_publishers.joint_state_broadcaster:main',
         ],
     },
 )

@@ -84,9 +84,9 @@ def generate_launch_description():
         respawn=True,
         respawn_delay=4,
     )
-    joint_state_pub = Node(
+    joint_state_broadcaster = Node(
         package=package_name,
-        executable='joint_state_pub',
+        executable='joint_state_broadcaster',
         #namespace=robot_name,
         parameters=[{"robot_ip": robot_ip,
                      "robot_name": robot_name,},],
@@ -104,7 +104,7 @@ def generate_launch_description():
        prox_node,
        speed_node,
        force_sensor,
-       joint_state_pub,
+       joint_state_broadcaster,
        #LogInfo(msg=LaunchConfiguration('robot_ip')),
        #LogInfo(msg=LaunchConfiguration('robot_name')),
     ])
