@@ -50,7 +50,11 @@ class current_joint(Node):
 
         # degree to radian
         deg_arr = self.bot.read_current_joint_position()
-        rad_arr = list(np.deg2rad(deg_arr))                          
+        rad_arr = list(np.deg2rad(deg_arr)) 
+
+        # handle J23 coupling factor (for lr_mate_200id4s - J3' = J3 + J2) - (IMP)
+        rad_arr[2] = rad_arr[2] + rad_arr[1]
+
         msg.position = rad_arr
         msg.velocity = []
         msg.effort = []
