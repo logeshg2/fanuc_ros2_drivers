@@ -41,6 +41,7 @@ class robot:
         self.sync_value = 1
         self.speed_register = 5
         self.air_gripper_register = 6
+        self.cnt_motion_register = 3
 
         self.DEBUG = DEBUG
         FANUCethernetipDriver.DEBUG = DEBUG
@@ -146,7 +147,7 @@ class robot:
             joint_number += 1
 
         FANUCethernetipDriver.writeJointPositionRegister(self.robot_IP, self.PRNumber, self.CurJointPosList)
-        self.start_robot(blocking=blocking)
+        # self.start_robot(blocking=blocking)
         
 
     # Cartesian Movement Functions
@@ -282,6 +283,23 @@ class robot:
             print("********************************************")
         elif blocking == False:
             pass # If an error happens here, it 'dies quietly' 
+
+    # Start continuous robot movement (writing register R[3] to 1)
+    # It will not get resetted - use stop_cnt_motion() to stop or reset the register R[3]
+    def start_cnt_motion(self):
+        """
+        start_cnt_motion function sets the register R[3] to perform continous motion.
+        """
+        # Write register
+        FANUCethernetipDriver.writeR_Register(self.robot_IP, self.cnt_motion_register, 1)
+
+    # Stop continuous motion function
+    def stop_cnt_motion(self):
+        """
+        stop_cnt_motion function resets the register R[3] to stop perform continous motion.
+        """
+        # Write register
+        FANUCethernetipDriver.writeR_Register(self.robot_IP, self.cnt_motion_register, 0)
 
     # Detect if the robot is moving
     def is_moving(self) -> bool:

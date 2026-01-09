@@ -30,6 +30,7 @@ setup(
             'speed_check = msg_publishers.speed_check:main',
             'force_sensor = msg_publishers.force_sensor:main',
             'joint_state_broadcaster = msg_publishers.joint_state_broadcaster:main',
+            'joint_state_reader = msg_publishers.joint_state_reader:main',
         ],
     },
 )

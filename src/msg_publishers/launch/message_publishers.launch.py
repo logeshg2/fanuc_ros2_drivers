@@ -93,18 +93,28 @@ def generate_launch_description():
         respawn=True,
         respawn_delay=4,
     )
+    joint_state_reader = Node(
+        package=package_name,
+        executable='joint_state_reader',
+        #namespace=robot_name,
+        parameters=[{"robot_ip": robot_ip,
+                     "robot_name": robot_name,},],
+        respawn=True,
+        respawn_delay=4,
+    )
 
     return launch.LaunchDescription([
-       robot_name_launch_arg,
-       robot_ip_launch_arg,
-       cart_node,
-       grip_node,
-       joint_node,
-       move_node,
-       prox_node,
-       speed_node,
-       force_sensor,
-       joint_state_broadcaster,
-       #LogInfo(msg=LaunchConfiguration('robot_ip')),
-       #LogInfo(msg=LaunchConfiguration('robot_name')),
+        robot_name_launch_arg,
+        robot_ip_launch_arg,
+        cart_node,
+        grip_node,
+        joint_node,
+        move_node,
+        prox_node,
+        speed_node,
+        force_sensor,
+        # joint_state_broadcaster,  # uncomment this if need to visualize real arm movement
+        joint_state_reader,
+        #LogInfo(msg=LaunchConfiguration('robot_ip')),
+        #LogInfo(msg=LaunchConfiguration('robot_name')),
     ])
