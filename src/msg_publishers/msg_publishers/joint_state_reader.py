@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+### IMP NOTE:
+# This was a wrong implementation of the intended task - please do not use this script.
+
 """
 This particular node is used for moving the real robot - read the '/joint_states' topic message and perform movement action.
 NOTE: "Joint State Reader" - Reads rviz plans robot joint position and performs actions through direct writing registers (no ros2 actions involved).
