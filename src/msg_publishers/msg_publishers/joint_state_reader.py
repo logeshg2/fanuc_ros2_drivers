@@ -16,6 +16,7 @@ import ComDependencies.FANUCethernetipDriver as FANUCethernetipDriver
 from ComDependencies.robot_controller import robot
 from sensor_msgs.msg import JointState
 from rclpy.node import Node
+from rclpy.callback_groups import ReentrantCallbackGroup
 
 FANUCethernetipDriver.DEBUG = False
 
@@ -45,11 +46,13 @@ class joint_state_reader(Node):
         self.prev_joint_val = None
         self.joint_angle_tolerance = 0.01   # ~ 1 deg
 
+        self.ret_cb_group = ReentrantCallbackGroup()
+
         self.bot = robot(self.get_parameter('robot_ip').value)
-        self.publisher_ = self.create_subscription(JointState, "joint_states", self.joint_states_cb, 10)
-        timer_period = 1/50     # 20hz
+        self.publisher_ = self.create_subscription(JointState, "joint_states", self.joint_states_cb, 10, callback_group=self.ret_cb_group)
+        timer_period = 1/100     # 20hz
         # self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.move_arm_timer = self.create_timer(timer_period, self.timer_callback_2)
+        self.move_arm_timer = self.create_timer(timer_period, self.timer_callback_2,  callback_group=self.ret_cb_group)
 
     def joint_states_cb(self, msg):
         # put in queue only if there is significant change in target joint position
