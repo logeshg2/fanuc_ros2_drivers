@@ -73,6 +73,15 @@ def generate_launch_description():
         respawn=True,
         respawn_delay=4,
     )
+    sjoint_node = Node(
+        package='action_servers',
+        executable='follow_joint_server',
+        #namespace=robot_name,
+        parameters=[{"robot_ip": robot_ip,
+                     "robot_name": robot_name,},],
+        respawn=True,
+        respawn_delay=4,
+    )
 
     return launch.LaunchDescription([
        robot_name_launch_arg,

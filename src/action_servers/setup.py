@@ -28,6 +28,7 @@ setup(
             'onrobot_server = action_servers.onrobot_server:main',
             'schunk_server = action_servers.schunk_server:main',
             'single_joint_server = action_servers.single_joint_server:main',
+            'follow_joint_server = action_servers.follow_joint_traj_server:main',
         ],
     },
 )
