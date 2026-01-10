@@ -93,15 +93,6 @@ def generate_launch_description():
         respawn=True,
         respawn_delay=4,
     )
-    # joint_state_reader = Node(
-    #     package=package_name,
-    #     executable='joint_state_reader',
-    #     #namespace=robot_name,
-    #     parameters=[{"robot_ip": robot_ip,
-    #                  "robot_name": robot_name,},],
-    #     respawn=True,
-    #     respawn_delay=4,
-    # )
 
     return launch.LaunchDescription([
         robot_name_launch_arg,
@@ -114,7 +105,6 @@ def generate_launch_description():
         speed_node,
         force_sensor,
         joint_state_broadcaster,
-        # joint_state_reader,
         #LogInfo(msg=LaunchConfiguration('robot_ip')),
         #LogInfo(msg=LaunchConfiguration('robot_name')),
     ])

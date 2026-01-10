@@ -147,7 +147,7 @@ class robot:
             joint_number += 1
 
         FANUCethernetipDriver.writeJointPositionRegister(self.robot_IP, self.PRNumber, self.CurJointPosList)
-        # self.start_robot(blocking=blocking)
+        self.start_robot(blocking=blocking)
         
 
     # Cartesian Movement Functions
