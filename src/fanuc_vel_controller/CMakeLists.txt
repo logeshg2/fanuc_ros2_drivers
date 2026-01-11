@@ -11,6 +11,16 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
+# Install Python executables
+install(PROGRAMS
+  scripts/robot_jacobian_eg.py
+  scripts/simple_twist_pub.py
+  fanuc_vel_controller/ee_vel_cmd.py
+  fanuc_vel_controller/fanuc_model.py
+  fanuc_vel_controller/current_cart.py 
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights

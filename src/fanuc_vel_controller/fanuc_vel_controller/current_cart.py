@@ -35,7 +35,7 @@ class current_cartesian(Node):
         self.publisher_ = self.create_publisher(CurCartesian, f"{self.get_parameter('robot_name').value}/cur_cartesian", 10)
         self.inc_srv_trig = self.create_service(SetBool, '/trigger_inc_movement', self.trigger_inc_move_cb)
         timer_period = 0.5
-        inc_timer_period = 1/100     # 20hz
+        inc_timer_period = 1/100     # 100hz
         self.timer = self.create_timer(timer_period, self.timer_callback, self.mut_cb_group)
         self.inc_timer = self.create_timer(inc_timer_period, self.timer_callback_2, self.mut_cb_group)
 
