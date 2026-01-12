@@ -18,6 +18,7 @@ install(PROGRAMS
   fanuc_vel_controller/ee_vel_cmd.py
   fanuc_vel_controller/fanuc_model.py
   fanuc_vel_controller/current_cart.py 
+  fanuc_vel_controller/pose_vel_cmd.py 
   DESTINATION lib/${PROJECT_NAME}
 )
 
