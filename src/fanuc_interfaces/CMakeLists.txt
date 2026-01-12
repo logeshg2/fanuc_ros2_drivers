@@ -48,6 +48,7 @@ set(msg_files
 set(srv_files
    "srv/Mount.srv"
    "srv/SetSpeed.srv"
+   "srv/EETwist.srv"
 )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
