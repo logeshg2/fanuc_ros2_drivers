@@ -2,6 +2,7 @@
 # NOTE: I am using python3-venv for robotics-toolbox - please set to default py-interpreter if you install rtb in global env. 
 
 import os
+import time
 import numpy as np
 import spatialmath as sm
 import matplotlib.pyplot as plt
@@ -88,8 +89,32 @@ if __name__ == "__main__":
 
     robot = Fanuc()
     print(robot)
-    print(robot.jacobe(robot.qz))
-    #robot.plot(robot.qz, block=True)
+    # print(robot.jacobe(robot.qz))
+    # print(robot.q)
+
+    vel = np.array([0.0, 0.0, 0.03, 0.0, 0.0, 0.0])
+
+    while True:
+        try:
+            # print(robot.q)
+            joint_vel = np.linalg.pinv(robot.jacobe(robot.q)) @ vel.T
+            joint_vel = joint_vel.flatten()
+
+            # use robot.jacobe - end effector vel jacobian matrix
+            # use robot.jacob0 - world coord vel jacobian matrix
+
+            robot.q = np.add(robot.q, joint_vel)
+            
+            # print(joint_vel)
+            # print(robot.q)
+            # break
+            # time.sleep(2)
+            robot.plot(robot.q, block=False)
+            plt.pause(2)
+            plt.cla()
+        except:
+            plt.close('all')
+            exit(0)
 
     '''
     # sample position

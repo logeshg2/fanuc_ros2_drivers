@@ -18,6 +18,7 @@ from fanuc_model import Fanuc
 from rclpy.node import Node
 from std_srvs.srv import SetBool
 from geometry_msgs.msg import TwistStamped
+from fanuc_interfaces.srv import EETwist
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
 
 FANUCethernetipDriver.DEBUG = False
@@ -31,15 +32,15 @@ class EETwistCMD(Node):
 
         self.declare_parameters(
             namespace='',
-            parameters=[('robot_ip','172.29.208.0'),
-                        ('robot_name','noNAME')] # custom, default
+            parameters=[('robot_ip','192.168.1.9'),
+                        ('robot_name','lr_mate_200id')] # custom, default
         )
 
         # robot model
         self.fanuc_model = Fanuc()
         self.get_logger().info(f"Fanuc model (RTB model): {self.fanuc_model.name}")
 
-        self.ee_vel = None
+        self.ee_vel = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         self.inc_triggered = False
         inc_timer_period = 1/100     # 100hz
         self.mut_cb_group = MutuallyExclusiveCallbackGroup()
@@ -49,6 +50,7 @@ class EETwistCMD(Node):
         
         self.twist_sub = self.create_subscription(TwistStamped, '/fanuc_servo/delta_twist_cmds', self.twist_callback, 10)
         self.inc_srv_trig = self.create_service(SetBool, '/trigger_inc_movement', self.trigger_inc_move_cb)
+        self.ee_twist_srv = self.create_service(EETwist, '/fanuc_ee_twist', self.ee_twist_cb)
         # self.inc_timer = self.create_timer(inc_timer_period, self.timer_callback_2, self.mut_cb_group)
         self.ee_vel_timer = self.create_timer(inc_timer_period, self.timer_callback_3, self.mut_cb_group)
 
@@ -85,8 +87,12 @@ class EETwistCMD(Node):
             self.get_logger().info(f"Time taken: {time.perf_counter() - s}")
 
     def twist_callback(self, msg):
-        # take the latest message - WIP (this might also go wrong)
-        if (abs(self.get_clock().now() - msg.header.stamp.from_msg()) < 200):       # 200 ms i guess
+        # check the latest msg
+        cur_time_ns = self.get_clock().now().nanoseconds
+        msg_time_ns = msg.header.stamp.sec * (10 ** 9) + msg.header.stamp.nanosec
+        time_diff_ms = (cur_time_ns - msg_time_ns) // (10 ** 6)     # millisecond
+
+        if (abs(time_diff_ms) < 200):       # 200 ms
             self.ee_vel = [msg.twist.linear.x, 
                            msg.twist.linear.y, 
                            msg.twist.linear.z, 
@@ -95,31 +101,48 @@ class EETwistCMD(Node):
                            msg.twist.angular.z
                            ]
 
+    def ee_twist_cb(self, request, response):
+        self.ee_vel = [request.x_dot,
+                       request.y_dot,
+                       request.z_dot,
+                       request.w_dot,
+                       request.p_dot,
+                       request.r_dot]
+        
+        self.get_logger().info(f"Target EE Vel received: {self.ee_vel}")
+        response.success = True
+        response.message = f"Target ee velocity set"
+        return response
+
     def timer_callback_3(self):
-        if (self.inc_triggered):
+        if (self.inc_triggered or np.any(np.array(self.ee_vel))):
             # read the current cartesion position
-            cur_joint_pose = self.bot.read_current_joint_position()      # [X, Y, Z, W, P, R]
+            cur_joint_pose = self.bot.read_current_joint_position()
             # current joint position (deg to rad) + J23 coupling
             rad_arr = np.deg2rad(cur_joint_pose)
             # remove coupling - J[3]' = J[3] + J[2]
             rad_arr[2] = rad_arr[2] + rad_arr[1]
+            print(rad_arr)
 
             # ee velocity to joint velocity (for current joint angles)
             current_jacobian = self.fanuc_model.jacobe(q=np.array(rad_arr))             # 6x6 matrix
             joint_vels = (np.linalg.pinv(current_jacobian) @ np.array([self.ee_vel]).T)  # 6x6 @ 6x1 => 6x1
-            joint_vels = joint_vels.flatten().tolist()      # [Vj1, Vj2, Vj3, Vj4, Vj5, Vj6]
+            joint_vels = joint_vels.flatten()      # [Vj1, Vj2, Vj3, Vj4, Vj5, Vj6]
 
             # some filtering has to be done on the joint velocities before adding to the current joint positioni
             ### TODO: filter to joint_vels (or some PID control) - not sure
+            
+            # worked after inverting the target velocity of joint 2 (may be it is inverted)
+            joint_vels[1] *= -1
 
-            # add that to current joint position to create target joint position
-            target_joint_pose = cur_joint_pose
-            target_joint_pose[0] += joint_vels[0]
-            target_joint_pose[1] += joint_vels[1]
-            target_joint_pose[2] += joint_vels[2]
-            target_joint_pose[3] += joint_vels[3]
-            target_joint_pose[4] += joint_vels[4]
-            target_joint_pose[5] += joint_vels[5]
+            # add that to current joint position
+            target_rad_arr = np.add(rad_arr, joint_vels)
+            
+            # adding coupling - J[3]' = J[3] - J[2]
+            target_rad_arr[2] = target_rad_arr[2] - target_rad_arr[1]
+            target_joint_pose = np.rad2deg(target_rad_arr).tolist()
+
+            self.get_logger().info(f"target ee vel: {self.ee_vel}")
 
             # write register and sync-movement
             self.get_logger().info(f"Computed Joint Position: {target_joint_pose}")
