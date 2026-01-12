@@ -15,10 +15,12 @@ find_package(ament_cmake REQUIRED)
 install(PROGRAMS
   scripts/robot_jacobian_eg.py
   scripts/simple_twist_pub.py
+  scripts/aruco_node.py
   fanuc_vel_controller/ee_vel_cmd.py
   fanuc_vel_controller/fanuc_model.py
   fanuc_vel_controller/current_cart.py 
   fanuc_vel_controller/pose_vel_cmd.py 
+  fanuc_vel_controller/aruco_tracker.py 
   DESTINATION lib/${PROJECT_NAME}
 )
 
