@@ -19,7 +19,7 @@ class ArucoNode(Node):
     def __init__(self):
         super().__init__("aruco_node")
 
-        self.declare_parameter('camera_id', 0)
+        self.declare_parameter('camera_id', 2)
         self.declare_parameter('frame_width', 640.0)
         self.declare_parameter('frame_height', 480.0)
         self.cam_dev_id = self.get_parameter('camera_id').get_parameter_value().integer_value
@@ -73,6 +73,8 @@ class ArucoNode(Node):
             cy = p1[1] + (p3[1] - p1[1]) // 2
             self.aruco_center = np.array([int(cx), int(cy)])
             self.latest_image = cv2.circle(self.latest_image, self.aruco_center, radius=5, thickness=-1, color=(255, 0, 0))
+        else:
+            self.aruco_center = np.array([-1, -1])
 
     def image_reader_timer(self):
         # acquire latest image

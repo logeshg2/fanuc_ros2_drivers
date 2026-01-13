@@ -50,18 +50,18 @@ class ArucoTracker(Node):
         self.pixel_error = None
         
         self.ee_vel = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        self.tracking_pose = [250.0, 100.0, 100.0, 179.0, 0.0015575372381135821, 0.0010508003178983927]
+        self.tracking_pose = [60.0, 300.0, 140.0, 179.0, 0.0015575372381135821, 0.0010508003178983927]
         self.triggered = False
         inc_timer_period = 1/100     # 100hz
         self.mut_cb_group = MutuallyExclusiveCallbackGroup()
         
         # PID control (TODO: tune this)
-        self.KPX = 5*(0.0001)
-        self.KDX = 2*(0.0001)
-        self.KIX = 0*(0.00001)
-        self.KPY = 1*(0.00001)
-        self.KDY = 5*(0.000001)
-        self.KIY = 0*(0.00001)
+        self.KPX = 2*(0.0001)
+        self.KIX = 1*(0.000001)
+        self.KDX = 0*(0.00001)
+        self.KPY = 2*(0.0001)
+        self.KIY = 1*(0.000001)
+        self.KDY = 0*(0.00001)
 
         # real hardware robot arm
         self.bot = robot(self.get_parameter('robot_ip').value)
@@ -75,6 +75,8 @@ class ArucoTracker(Node):
     def aruco_center_cb(self, msg):
         if (msg.data is not None):
             self.aruco_center = np.array(msg.data)
+            if (self.aruco_center[0] == -1 and self.aruco_center[1] == -1):
+                self.aruco_center = None
 
     def trigger_tracking_cb(self, request, response):
         if (request.data):
@@ -94,9 +96,12 @@ class ArucoTracker(Node):
 
     def compute_ee_vel_from_pixel(self):
         if (self.aruco_center is not None):
-            self.pixel_error = np.subtract(self.frame_center - self.aruco_center)
+            self.pixel_error = np.subtract(self.frame_center, self.aruco_center)
             self.ee_vel[0] = (self.pixel_error[0] * self.KPX) + (self.pixel_error[0] * self.KIX) + (self.pixel_error[0] * self.KDX)
             self.ee_vel[1] = (self.pixel_error[1] * self.KPY) + (self.pixel_error[1] * self.KIY) + (self.pixel_error[1] * self.KDY)
+            self.ee_vel[0] *= -1    # invert x-axis
+            # self.ee_vel[1] *= -1    # invert y-axis
+            self.ee_vel[0], self.ee_vel[1] = self.ee_vel[1], self.ee_vel[0]
         else:
             self.pixel_error = None
             self.ee_vel = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -146,7 +151,8 @@ def main(args=None):
     try:
         tracker_node = ArucoTracker()
         rclpy.spin(tracker_node)
-    except:
+    except Exception as e:
+        print(e)
         print(f"Shutting down the node!\n")
         tracker_node.destroy_node()
         # rclpy.shutdown()
