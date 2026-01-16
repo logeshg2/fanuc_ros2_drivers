@@ -51,6 +51,7 @@ class ArucoTracker(Node):
         
         self.ee_vel = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
         self.tracking_pose = [60.0, 300.0, 140.0, 179.0, 0.0015575372381135821, 0.0010508003178983927]
+        self.tracking_pose_1 = [195.0, 220.0, 120.0, -95.0, -72.0, -37.0]
         self.triggered = False
         inc_timer_period = 1/100     # 100hz
         self.mut_cb_group = MutuallyExclusiveCallbackGroup()
@@ -130,6 +131,9 @@ class ArucoTracker(Node):
             
             # worked after inverting the target velocity of joint 2 (may be it is inverted)
             joint_vels[1] *= -1
+
+            # removing velocity on J4 - safety reasons
+            joint_vels[3] = 0.0
 
             # add that to current joint position
             target_rad_arr = np.add(rad_arr, joint_vels)
