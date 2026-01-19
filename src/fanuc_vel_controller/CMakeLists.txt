@@ -22,7 +22,7 @@ install(PROGRAMS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-# ament_python_install_package("fanuc_vel_controller")
+ament_python_install_package("fanuc_vel_controller")
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 
 ament_package()

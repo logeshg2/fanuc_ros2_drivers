@@ -66,10 +66,10 @@ def generate_launch_description():
         gui_arg,
         model_arg,
         rviz_arg,
-        # move_group,
+        move_group,
         # hand_eye_static_launcher,
         # joint_state_publisher_node,
         # joint_state_publisher_gui_node,
-        # robot_state_publisher_node,
+        robot_state_publisher_node,
         rviz_node
     ])
