@@ -187,7 +187,7 @@
    <!-- ROS-Industrial 'tool0' frame: all-zeros tool frame  -->
     <link name="${prefix}tool0" />
     <joint name="${prefix}link_6-tool0" type="fixed">
-      <origin xyz="0.095 0 0" rpy="0 0 0" />
+      <origin xyz="0 0 0" rpy="3.1415926535 -1.570796327 0" />  <!-- xyz="0.095 0 0" -->
       <parent link="${prefix}link_6" />
       <child link="${prefix}tool0" />
     </joint>
