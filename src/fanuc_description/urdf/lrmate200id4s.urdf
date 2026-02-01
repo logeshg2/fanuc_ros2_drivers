@@ -181,11 +181,11 @@
     <parent link="link_6"/>
     <child link="flange"/>
   </joint>
-  < ROS-Industrial 'tool0' frame: all-zeros tool frame 
+  < ROS-Industrial 'tool0' frame: all-zeros tool frame --> 
   <link name="tool0"/>
-  <joint name="flange-tool0" type="fixed">
-    <origin rpy="3.141592653589793 -1.5707963267948966 0" xyz="0 0 0"/>
-    <parent link="flange"/>
+  <joint name="link_6-tool0" type="fixed">
+    <origin rpy="3.1415926535 -1.570796327 0" xyz="0 0 0"/>
+    <parent link="link_6"/>
     <child link="tool0"/>
-  </joint> -->
+  </joint>
 </robot>
