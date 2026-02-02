@@ -9,7 +9,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 import os
 
 def generate_launch_description():
-    default_model_path = get_package_share_path('moveit_fanuc_description') / 'urdf/lrmate200id4s.xacro'
+    default_model_path = get_package_share_path('moveit_fanuc_description') / 'urdf/lrmate200id4s.urdf'
     default_rviz_config_path = get_package_share_path('fanuc_moveit_config') / 'rviz/urdf.rviz'
 
     gui_arg = DeclareLaunchArgument(name='gui', default_value='false', choices=['true', 'false'],
