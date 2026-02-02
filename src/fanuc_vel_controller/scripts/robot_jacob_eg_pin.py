@@ -31,7 +31,7 @@ viz.loadViewerModel()
 
 q0 = pinocchio.neutral(model)
 q_rand = pinocchio.randomConfiguration(model)
-viz.display(q_rand)
+viz.display(qz)
 viz.displayVisuals(True)
 
 while True:
@@ -42,8 +42,9 @@ while True:
 collision_model.addAllCollisionPairs()
 geom_data = pinocchio.GeometryData(collision_model)
 q = np.array([0.0, 10.0, 0.0, 0.0, 0.0, 0.0])
+q1 = np.array([0.0, 0.467, -1.204, 0.0, -2.094, 0.0])
 
-pinocchio.computeCollisions(model, data, collision_model, geom_data, q, False)
+pinocchio.computeCollisions(model, data, collision_model, geom_data, q1, False)
 
 # Print the status of collision for all collision pairs
 for k in range(len(collision_model.collisionPairs)):
