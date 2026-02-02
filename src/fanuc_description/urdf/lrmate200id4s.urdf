@@ -124,6 +124,58 @@
       </geometry>
     </collision>
   </link>
+  <link name="force_sensor">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://moveit_fanuc_description/meshes/visual/fs_15aie.stl"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.15 0.15 0.15 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://moveit_fanuc_description/meshes/collision/fs_15aie.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="rs_mount">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://moveit_fanuc_description/meshes/visual/ee_mount.stl"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.196 0.164 0.132 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://moveit_fanuc_description/meshes/collision/ee_mount.stl"/>
+      </geometry>
+    </collision>
+  </link>
+  <link name="rs_d435i">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://moveit_fanuc_description/meshes/visual/rs_d435i.stl"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.192 0.192 0.192 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://moveit_fanuc_description/meshes/collision/rs_d435i.stl"/>
+      </geometry>
+    </collision>
+  </link>
+
   <!-- joints: main serial chain -->
   <joint name="joint_1" type="revolute">
     <origin rpy="0 0 0" xyz="0 0 0.330"/>
@@ -188,4 +240,23 @@
     <parent link="link_6"/>
     <child link="tool0"/>
   </joint>
+
+  <joint name="tool0_fs" type="fixed">
+    <origin rpy="3.1415926535 0 -1.570796327" xyz="0 0 0.03052"/>
+    <parent link="tool0"/>
+    <child link="force_sensor"/>
+  </joint>
+
+  <joint name="fs_eeMount" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 -0.005"/>
+    <parent link="force_sensor"/>
+    <child link="rs_mount"/>
+  </joint>
+
+  <joint name="eeMount_rs" type="fixed">
+    <origin rpy="3.1415926535 0 0" xyz="0 -0.07028 0"/>
+    <parent link="rs_mount"/>
+    <child link="rs_d435i"/>
+  </joint>
+
 </robot>
