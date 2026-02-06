@@ -58,7 +58,7 @@ def generate_launch_description():
     # static publisher launcher of hand eye calibration
     hand_eye_static_launcher = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            str(get_package_share_path('fanuc_statemachine')/ "launch/hand_eye_calibration_rs.launch.py")
+            str(get_package_share_path('fanuc_statemachine')/ "launch/eye_in_hand_calibration_rs.launch.py")
         ),
     )
 
@@ -67,7 +67,7 @@ def generate_launch_description():
         model_arg,
         rviz_arg,
         move_group,
-        # hand_eye_static_launcher,
+        hand_eye_static_launcher,
         # joint_state_publisher_node,
         # joint_state_publisher_gui_node,
         robot_state_publisher_node,
