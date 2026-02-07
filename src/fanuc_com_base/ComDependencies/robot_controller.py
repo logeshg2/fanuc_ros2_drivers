@@ -40,12 +40,16 @@ class robot:
         self.sync_register = 2
         self.sync_value = 1
         self.speed_register = 5
+        self.speed_percent = 4
         self.air_gripper_register = 6
         self.cnt_motion_register = 3
 
         self.DEBUG = DEBUG
         FANUCethernetipDriver.DEBUG = DEBUG
 
+        # defaults
+        self.set_speed_percent(100)
+        
 
     # set debug on or off
     def set_debug(state:bool):
@@ -234,6 +238,16 @@ class robot:
             raise Warning(f"Speed should be in the range of [0, 300], got {value}")
         
         FANUCethernetipDriver.writeR_Register(self.robot_IP, self.speed_register, value)
+
+    # write R[4] to set speed percentage
+    def set_speed_percent(self, value: int):
+        """
+        Function to set speed percentage (%).
+        """
+        if (value > 100 or value < 0):
+            raise Warning(f"Speed percentage should be in range of [0, 100], got {value}")
+        
+        FANUCethernetipDriver.writeR_Register(self.robot_IP, self.speed_percent, value)
 
     # get current speed
     def get_speed(self) -> int:
