@@ -21,6 +21,7 @@
 # Imports
 import math
 import typing
+import numpy as np
 from . import FANUCethernetipDriver
 
 ## The mode of operation; 
@@ -194,6 +195,11 @@ class robot:
             
         # If here, coords is NOT a list of lists (single list)
         elif len(coords) == 6:
+            # limit angle (WPR)
+            coords[3] = np.clip(coords[3], -179.9, 179.9)
+            coords[4] = np.clip(coords[4], -179.9, 179.9)
+            coords[5] = np.clip(coords[5], -179.9, 179.9)
+            
             # This means we got all 6 coordinates
             # First check that the W,P, R are vaild moves
             if coords[3] > 179.9 or coords[3] < -179.9:
