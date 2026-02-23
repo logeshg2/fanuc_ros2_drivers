@@ -83,9 +83,11 @@ class robot:
         mx_reg = 8
         my_reg = 9
         fz_val = FANUCethernetipDriver.readR_Register(self.robot_IP, fz_reg)
-        mx_val = FANUCethernetipDriver.readR_Register(self.robot_IP, mx_reg)
-        my_val = FANUCethernetipDriver.readR_Register(self.robot_IP, my_reg)
-        # NOTE: stored as: R[x] = FS_val * 1000 (removed for now) - WIP 
+        mx_val = FANUCethernetipDriver.readR_Register_float(self.robot_IP, mx_reg)
+        my_val = FANUCethernetipDriver.readR_Register_float(self.robot_IP, my_reg)
+        # NOTE: stored as: R[x] = FS_val * 100
+        mx_val /= 100.0 
+        my_val /= 100.0 
 
         # print(f"Force Sensor: Fz: {fz_val}")
         # print(f"Force Sensor: Mx: {mx_val}")

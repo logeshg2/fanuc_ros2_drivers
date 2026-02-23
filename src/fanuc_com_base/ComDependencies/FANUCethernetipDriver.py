@@ -512,6 +512,33 @@ def readR_Register(drive_path, RegNum):
           print("myList=", myList)
    return myList[0]
 
+# function to read floating point
+def readR_Register_float(drive_path, RegNum):
+	
+    with CIPDriver(drive_path) as drive:
+        myTag = drive.generic_message(
+            service=0xe,
+            class_code=0x6B,
+            instance=0x1,  
+            attribute=RegNum,
+            data_type=None,
+            connected=False,
+            unconnected_send=False,
+            route_path=False,
+            name='fanucRread'
+        )
+        if (DEBUG == True):
+          print("R[%d]= %x",RegNum,myTag.value)
+          print(myTag)
+          print("myTag.type=", myTag.type)
+        myList = list(myTag.value)
+
+        if (DEBUG == True):
+          print("myList=", myList)
+    
+    out = struct.unpack('<i', myTag.value)[0]
+    return out
+
 def readDigitalInputs(drive_path):
 
     with CIPDriver(drive_path) as drive:
