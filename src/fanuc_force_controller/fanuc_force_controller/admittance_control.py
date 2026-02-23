@@ -57,7 +57,8 @@ class AdmittanceControl(Node):
         self.maIdx = 0
 
         # force control parameter
-        self.FT_ideal = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        Fz, Mx, My = self.bot.read_force_sensor_values()     # [Fz, Mx, My]
+        self.FT_ideal = np.array([0.0, 0.0, Fz, 0.0, 0.0, 0.0])
         self.H = np.array([
             [0.1, 0.0, 0.0, 0.0, 0.0, 0.0],
             [0.0, 0.1, 0.0, 0.0, 0.0, 0.0],
@@ -67,9 +68,27 @@ class AdmittanceControl(Node):
             [0.0, 0.0, 0.0, 0.0, 0.0, 0.1]
         ])
 
+        self.mass = np.array([
+            [10, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 10, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 10, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 1, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 1, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 0.5]
+        ])
+        self.damp = np.array([
+            [30, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 30, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 30, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 7, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 7, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 7]
+        ])
+        self.arm_des_twist = np.zeros((6,1))
+
         # ros2 comm variables
         self.inc_srv_trig = self.create_service(SetBool, '/trigger_servoing', self.trigger_servoing_cb)
-        self.main_timer = self.create_timer(1/100, self.main_timer_cb)
+        self.main_timer = self.create_timer(1/20, self.main_timer_cb)
 
 
     def trigger_servoing_cb(self, request, response):
@@ -79,10 +98,10 @@ class AdmittanceControl(Node):
             self.triggered = False
         
         # go to tracking position
-        self.bot.write_cartesian_position(coords=self.tracking_pose, blocking=False)
-        time.sleep(2)
-        while (self.bot.is_moving()):
-            time.sleep(0.1)
+        # self.bot.write_cartesian_position(coords=self.tracking_pose, blocking=False)
+        # time.sleep(2)
+        # while (self.bot.is_moving()):
+        #     time.sleep(0.1)
 
         response.success = True
         response.message = "trigger successful"
@@ -125,16 +144,25 @@ class AdmittanceControl(Node):
             # read force
             Fz, Mx, My = self.bot.read_force_sensor_values()     # [Fz, Mx, My]
             curFT_val = np.array([0.0, 0.0, Fz, 0.0, 0.0, 0.0])
-            measuredFT = self.FT_ideal - curFT_val
+            measuredFT = curFT_val - self.FT_ideal
             measuredFT = np.array(measuredFT).reshape((6,1))
 
             # compute robot jacobian
             jac = pinocchio.computeFrameJacobian(self.robotModel, self.robotData, np.array(rad_arr), self.eeFrameId)
 
+            """
             # cartesian / ee velocity computation (based on force applied)
-            cartAcc = jac @ np.linalg.pinv(self.H) @ np.array(jac).T
-            cartVel = cartAcc * self.dt
-            joint_vels = (np.linalg.pinv(jac) @ np.array([cartVel]).T)
+            cartAcc = (jac @ np.linalg.pinv(self.H) @ np.array(jac).T) @ measuredFT
+            cartVel = cartAcc * 0.001
+            """
+
+            arm_des_acc = np.linalg.pinv(self.mass) @ ((-self.damp @ self.arm_des_twist) + measuredFT)
+            self.arm_des_twist = arm_des_acc * 0.1
+            cartVel = self.arm_des_twist.flatten()
+
+            print(np.round(cartVel, 2))
+            
+            joint_vels = (np.linalg.pinv(jac) @ np.array([cartVel]).reshape((6,1)))
             joint_vels = joint_vels.flatten()
 
             # compute target joint angle from target velocity
