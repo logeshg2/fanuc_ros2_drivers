@@ -58,7 +58,7 @@ class AdmittanceControl(Node):
 
         # force control parameter
         Fz, Mx, My = self.bot.read_force_sensor_values()     # [Fz, Mx, My]
-        self.FT_ideal = np.array([0.0, 0.0, Fz, 0.0, 0.0, 0.0])
+        self.FT_ideal = np.array([0.0, 0.0, Fz, Mx, My, 0.0])
         self.H = np.array([
             [0.1, 0.0, 0.0, 0.0, 0.0, 0.0],
             [0.0, 0.1, 0.0, 0.0, 0.0, 0.0],
@@ -69,20 +69,20 @@ class AdmittanceControl(Node):
         ])
 
         self.mass = np.array([
-            [10, 0.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 10, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 10, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 1, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 1, 0.0],
+            [8, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 8, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 8, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 3, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 3, 0.0],
             [0.0, 0.0, 0.0, 0.0, 0.0, 0.5]
         ])
         self.damp = np.array([
-            [30, 0.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 30, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 30, 0.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 7, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 7, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 0.0, 7]
+            [60, 0.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 60, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 60, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 15, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 15, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 0.0, 15]
         ])
         self.arm_des_twist = np.zeros((6,1))
 
@@ -143,7 +143,9 @@ class AdmittanceControl(Node):
 
             # read force
             Fz, Mx, My = self.bot.read_force_sensor_values()     # [Fz, Mx, My]
-            curFT_val = np.array([0.0, 0.0, Fz, 0.0, 0.0, 0.0])
+            # print(Fz, Mx, My)
+            
+            curFT_val = np.array([0.0, 0.0, Fz, Mx, My, 0.0])
             measuredFT = curFT_val - self.FT_ideal
             measuredFT = np.array(measuredFT).reshape((6,1))
 
@@ -159,6 +161,9 @@ class AdmittanceControl(Node):
             arm_des_acc = np.linalg.pinv(self.mass) @ ((-self.damp @ self.arm_des_twist) + measuredFT)
             self.arm_des_twist = arm_des_acc * 0.1
             cartVel = self.arm_des_twist.flatten()
+            cartVel[3], cartVel[4] = cartVel[4], cartVel[3]
+            cartVel[3] *= -1
+            cartVel[4] *= -1
 
             print(np.round(cartVel, 2))
             
