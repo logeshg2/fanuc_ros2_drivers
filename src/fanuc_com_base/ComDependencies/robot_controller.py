@@ -64,6 +64,20 @@ class robot:
         self.CurJointPosList = FANUCethernetipDriver.returnJointCurrentPosition(self.robot_IP)
         return self.CurJointPosList[2:8]
 
+    # remove J23 coupling
+    def remove_joint_coupling(self, joint_q) -> list:
+        """Funtion to remove joint coupling in the given joint_q"""
+        
+        joint_q[2] = joint_q[2] + joint_q[1]    # (+ J23 coupling)
+        return joint_q
+    
+    # add J23 coupling
+    def add_joint_coupling(self, joint_q) -> list:
+        """Funtion to add joint coupling in the given joint_q"""
+        
+        joint_q[2] = joint_q[2] - joint_q[1]    # (- J23 coupling)
+        return joint_q
+
     # read PR[1] Joint Coordinates
     def read_joint_position_register(self) -> float:
         """! Reads joint position register(PR1) and prints the value and prints list.
